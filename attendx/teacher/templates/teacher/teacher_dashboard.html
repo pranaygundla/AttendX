@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teacher Dashboard | AttendX</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f4f6f9;
+        }
+
+        /* Header */
+        .header {
+            height: 60px;
+            background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .menu-btn {
+            display: none;
+            font-size: 26px;
+            cursor: pointer;
+        }
+
+        /* Layout */
+        .container {
+            display: flex;
+            height: calc(100vh - 60px);
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 230px;
+            background-color: #111827;
+            color: white;
+            padding-top: 20px;
+            transition: transform 0.3s ease;
+        }
+
+        .sidebar h3 {
+            text-align: center;
+            margin-bottom: 25px;
+            color: #e5e7eb;
+        }
+
+        .sidebar a {
+            display: block;
+            padding: 12px 25px;
+            color: #d1d5db;
+            text-decoration: none;
+        }
+
+        .sidebar a:hover {
+            background-color: #1f2937;
+            color: white;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .card {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+        }
+
+        .card h2 {
+            color: #2c5364;
+            margin-bottom: 10px;
+        }
+
+        .card p {
+            font-size: 17px;
+            color: #444;
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+
+            .menu-btn {
+                display: block;
+            }
+
+            .container {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                position: fixed;
+                top: 60px;
+                left: 0;
+                height: calc(100vh - 60px);
+                transform: translateX(-100%);
+                z-index: 1000;
+            }
+
+            .sidebar.active {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                padding: 15px;
+            }
+        }
+    </style>
+
+    <script>
+        function toggleMenu() {
+            document.getElementById("sidebar").classList.toggle("active");
+        }
+    </script>
+
+</head>
+<body>
+
+<!-- Header -->
+<div class="header">
+    <span class="menu-btn" onclick="toggleMenu()">☰</span>
+    JNTU UNIVERSITY – Kukatpally
+</div>
+
+<!-- Layout -->
+<div class="container">
+
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+        <h3>AttendX</h3>
+        <a href="#">🏠 Dashboard</a>
+        <a href="#">📝 Take Attendance</a>
+        <a href="#">📊 View Reports</a>
+        <a href="#">👤 Profile</a>
+        <a href="{% url 'logout' %}">🚪 Logout</a>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="card">
+            <h2>Teacher Dashboard</h2>
+            <p>Welcome <strong>{{ teacher.teacher_name }}</strong></p>
+        </div>
+    </div>
+
+</div>
+
+</body>
+</html>
