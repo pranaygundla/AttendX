@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mark Attendance | AttendX</title>
+
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f4f6f9;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: auto;
+            background: #ffffff;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        h2 {
+            color: #2a5298;
+            margin-bottom: 15px;
+        }
+
+        label {
+            font-weight: 600;
+            display: block;
+            margin-top: 15px;
+        }
+
+        select, input[type="date"], input[type="time"], input[type="number"] {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+            font-size: 15px;
+        }
+
+        hr {
+            margin: 25px 0;
+        }
+
+        /* Student List */
+        .student-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 15px;
+        }
+
+        .student-card {
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .student-card:hover {
+            background: #f0f4ff;
+        }
+
+        .student-info {
+            font-size: 14px;
+        }
+
+        .student-info strong {
+            color: #1f2937;
+        }
+
+        /* Toggle Switch */
+        .toggle {
+            position: relative;
+            width: 48px;
+            height: 26px;
+        }
+
+        .toggle input {
+            display: none;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #e74c3c;
+            transition: .4s;
+            border-radius: 34px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 20px;
+            width: 20px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: #2ecc71;
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(22px);
+        }
+
+        /* Buttons */
+        .btn {
+            margin-top: 25px;
+            padding: 12px 20px;
+            font-size: 16px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            width: 100%;
+        }
+
+        .btn:hover {
+            opacity: 0.9;
+        }
+
+        .success {
+            color: #16a34a;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        @media (max-width: 600px) {
+            .student-card {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+    </style>
+</head>
+<script>
+    window.onload = function () {
+        const dateField = document.getElementById("dateField");
+        const timeField = document.getElementById("timeField");
+        const durationField = document.getElementById("durationField");
+
+        const now = new Date();
+
+        // Set current date if empty
+        if (!dateField.value) {
+            dateField.value = now.toISOString().split("T")[0];
+        }
+
+        // Set current time if empty (HH:MM)
+        if (!timeField.value) {
+            const hours = String(now.getHours()).padStart(2, "0");
+            const minutes = String(now.getMinutes()).padStart(2, "0");
+            timeField.value = `${hours}:${minutes}`;
+        }
+
+        // Set default duration = 90 if empty
+        if (!durationField.value) {
+            durationField.value = 90;
+        }
+    };
+
+    function toggleSwitch(id) {
+        const checkbox = document.getElementById("toggle_" + id);
+        checkbox.checked = !checkbox.checked;
+    }
+</script>
+
+<body>
+
+<div class="container">
+    <h2>Mark Attendance</h2>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="success">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+
+    <form method="post">
+        {% csrf_token %}
+
+        <label>Subject</label>
+        <select name="subject" required>
+            <option value="">Select Subject</option>
+            {% for sub in subjects %}
+                <option value="{{ sub.id }}"
+                    {% if selected_subject and sub.id == selected_subject.id %}selected{% endif %}>
+                    {{ sub.subject_name }}
+                </option>
+            {% endfor %}
+        </select>
+
+        <label>Branch</label>
+        <select name="branch" required>
+            <option value="">Select Branch</option>
+            {% for b in branches %}
+                <option value="{{ b.id }}"
+                    {% if selected_branch and b.id == selected_branch.id %}selected{% endif %}>
+                    {{ b }}
+                </option>
+            {% endfor %}
+        </select>
+
+        <label>Date</label>
+<input type="date" name="date" id="dateField" value="{{ date }}" required>
+
+<label>Time</label>
+<input type="time" name="time" id="timeField" value="{{ time }}" required>
+
+<label>Duration (minutes)</label>
+<input type="number" name="duration" id="durationField" value="{{ duration|default:90 }}" required>
+
+
+        <hr>
+
+        {% if students %}
+            <h3>Students</h3>
+
+            <div class="student-list">
+                {% for student in students %}
+                <div class="student-card" onclick="toggleSwitch('{{ student.id }}')">
+                    <div class="student-info">
+                        <strong>{{ student.user.username }}</strong><br>
+                        {{ student.student_name }}
+                    </div>
+
+                    <label class="toggle">
+                        <input type="checkbox" id="toggle_{{ student.id }}" name="present_{{ student.id }}">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- Hidden fields -->
+            <input type="hidden" name="subject" value="{{ selected_subject.id }}">
+            <input type="hidden" name="branch" value="{{ selected_branch.id }}">
+            <input type="hidden" name="date" value="{{ date }}">
+            <input type="hidden" name="time" value="{{ time }}">
+            <input type="hidden" name="duration" value="{{ duration }}">
+
+            <button type="submit" name="submit_attendance" class="btn">
+                Submit Attendance
+            </button>
+        {% else %}
+            <button type="submit" class="btn">Load Students</button>
+        {% endif %}
+    </form>
+</div>
+
+<script>
+    function toggleSwitch(id) {
+        const checkbox = document.getElementById("toggle_" + id);
+        checkbox.checked = !checkbox.checked;
+    }
+</script>
+
+</body>
+</html>

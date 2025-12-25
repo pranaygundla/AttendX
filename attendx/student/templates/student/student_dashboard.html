@@ -72,31 +72,66 @@
         /* Main Content */
         .main-content {
             flex: 1;
-            padding: 20px;
+            padding: 25px;
             overflow-y: auto;
         }
 
-        .card {
+        .welcome-card {
             background: white;
             padding: 25px;
             border-radius: 10px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-            max-width: 600px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            margin-bottom: 25px;
         }
 
-        .card h2 {
+        .welcome-card h2 {
             color: #2a5298;
+            margin-bottom: 5px;
+        }
+
+        /* Attendance Cards */
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+        }
+
+        .stat-card {
+            padding: 25px;
+            border-radius: 12px;
+            color: white;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+        }
+
+        .present {
+            background: linear-gradient(135deg, #43cea2, #185a9d);
+        }
+
+        .absent {
+            background: linear-gradient(135deg, #ff512f, #dd2476);
+        }
+
+        .total {
+            background: linear-gradient(135deg, #396afc, #2948ff);
+        }
+
+        .stat-card h3 {
+            font-size: 18px;
             margin-bottom: 10px;
         }
 
-        .card p {
-            font-size: 17px;
-            color: #444;
+        .stat-card p {
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .stat-card small {
+            font-size: 14px;
+            opacity: 0.9;
         }
 
         /* Mobile Responsive */
         @media (max-width: 768px) {
-
             .menu-btn {
                 display: block;
             }
@@ -117,10 +152,6 @@
             .sidebar.active {
                 transform: translateX(0);
             }
-
-            .main-content {
-                padding: 15px;
-            }
         }
     </style>
 
@@ -129,8 +160,8 @@
             document.getElementById("sidebar").classList.toggle("active");
         }
     </script>
-
 </head>
+
 <body>
 
 <!-- Header -->
@@ -146,21 +177,91 @@
     <div class="sidebar" id="sidebar">
         <h3>AttendX</h3>
         <a href="#">🏠 Dashboard</a>
-        <a href="#">📊 View Attendance</a>
+        <!-- <a href="#">📊 View Attendance</a>
         <a href="#">📅 Attendance History</a>
-        <a href="#">👤 Profile</a>
+        <a href="#">👤 Profile</a> -->
         <a href="{% url 'logout' %}">🚪 Logout</a>
     </div>
 
     <!-- Main Content -->
     <div class="main-content">
-        <div class="card">
+
+        <!-- Welcome -->
+        <div class="welcome-card">
             <h2>Student Dashboard</h2>
             <p>Welcome <strong>{{ student.student_name }}</strong></p>
         </div>
-    </div>
 
+        <!-- Attendance Stats -->
+        <div class="stats">
+
+            <div class="stat-card present">
+                <h3>Present Percentage</h3>
+                <p>{{ present_percentage }}%</p>
+                <small>{{ present_duration }} minutes attended</small>
+            </div>
+
+            <div class="stat-card absent">
+                <h3>Absent Percentage</h3>
+                <p>{{ absent_percentage }}%</p>
+                <small>{{ absent_duration }} minutes absent</small>
+            </div>
+
+            <div class="stat-card total">
+                <h3>Total Class Duration</h3>
+                <p>{{ total_duration }}</p>
+                <small>minutes</small>
+            </div>
+
+        </div>
+<!-- Subject-wise Attendance -->
+<div style="margin-top:40px;">
+    <h2 style="color:#2a5298; margin-bottom:15px;">
+        Subject-Wise Attendance
+    </h2>
+
+    {% if subject_attendance %}
+        <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:20px;">
+            {% for sub in subject_attendance %}
+                <div style="
+                    background:#ffffff;
+                    padding:20px;
+                    border-radius:12px;
+                    box-shadow:0 8px 20px rgba(0,0,0,0.1);
+                ">
+                    <h3 style="margin-bottom:10px; color:#1e3c72;">
+                        {{ sub.subject }}
+                    </h3>
+
+                    <p>
+                        ✅ Present: 
+                        <strong style="color:#16a34a;">
+                            {{ sub.present_percentage }}%
+                        </strong>
+                    </p>
+
+                    <p>
+                        ❌ Absent: 
+                        <strong style="color:#dc2626;">
+                            {{ sub.absent_percentage }}%
+                        </strong>
+                    </p>
+
+                    <p style="margin-top:8px; font-size:14px; color:#555;">
+                        ⏱ Total Duration: {{ sub.total_duration }} minutes
+                    </p>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p>No attendance records available.</p>
+    {% endif %}
 </div>
+
+    </div>
+</div>
+
+
 
 </body>
 </html>
