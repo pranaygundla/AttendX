@@ -1,0 +1,6 @@
+services:
+  - type: web
+    name: attendx
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn attendx.wsgi:application
