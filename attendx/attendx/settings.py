@@ -27,6 +27,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = [
     "attendx-2-ax2g.onrender.com",
+    "attendx-csm.onrender.com/",
     "localhost",
     "127.0.0.1"
 ]
